@@ -1,0 +1,3 @@
+cargo:rerun-if-changed=build/main.rs
+cargo:rustc-env=TYPENUM_BUILD_CONSTS=/home/asus/Workspace/learn-CosmWasm/multi-contract/contracts/proxy/target/debug/build/typenum-24ac12b7af8b765b/out/consts.rs
+cargo:rustc-env=TYPENUM_BUILD_OP=/home/asus/Workspace/learn-CosmWasm/multi-contract/contracts/proxy/target/debug/build/typenum-24ac12b7af8b765b/out/op.rs
