@@ -48,7 +48,7 @@ pub fn execute(
     use ExecMsg::*;
 
     match msg {
-        Donate {} => exec::donate(deps),
+        Donate {} => exec::donate(deps, info),
         Withdraw { receiver, amount } => exec::withdraw(deps, receiver, amount),
         Close {} => exec::close(deps, info),
         ProposeMember { addr } => exec::propose_member(deps, addr),
