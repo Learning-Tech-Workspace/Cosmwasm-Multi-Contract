@@ -1,12 +1,15 @@
 use cosmwasm_std::{
     coins, ensure, to_binary, to_json_binary, DepsMut, Env, MessageInfo, Response, StdResult,
-    Timestamp, Uint128, WasmMsg,
+    SubMsg, Timestamp, Uint128, WasmMsg,
 };
 use cw_utils::must_pay;
 
+use crate::contract::WITHDRAW_REPLY_ID;
 use crate::error::ContractError;
 use crate::msg::{DistribtionExecMsg, MembershipExecMsg};
-use crate::state::{CONFIG, DONATIONS, HALFTIME, LAST_UPDATED, OWNER, WEIGHT};
+use crate::state::{
+    WithdrawalData, CONFIG, DONATIONS, HALFTIME, LAST_UPDATED, OWNER, PENDING_WITHDRAWAL, WEIGHT,
+};
 
 pub fn donate(deps: DepsMut, info: MessageInfo) -> Result<Response, ContractError> {
     let config = CONFIG.load(deps.storage)?;
@@ -39,10 +42,48 @@ pub fn donate(deps: DepsMut, info: MessageInfo) -> Result<Response, ContractErro
 
 pub fn withdraw(
     deps: DepsMut,
+    info: MessageInfo,
+    env: Env,
     receiver: Option<String>,
     amount: Option<Uint128>,
 ) -> Result<Response, ContractError> {
-    unimplemented!()
+    let owner = OWNER.load(deps.storage)?;
+    ensure!(owner == info.sender, ContractError::Unauthorized);
+
+    let weight = WEIGHT.load(deps.storage)?; // involvement
+    let donations = DONATIONS.load(deps.storage)?;
+    let diff = donations as i64 - weight as i64;
+
+    WEIGHT.save(deps.storage, &donations);
+    DONATIONS.save(deps.storage, &1);
+    LAST_UPDATED.save(deps.storage, &env.block.time.seconds());
+
+    let receiver = receiver
+        .map(|addr_str| deps.api.addr_validate(&addr_str))
+        .transpose()?
+        .unwrap_or_else(|| info.sender.clone()); // if do not specify receiver => withdraw to owner
+
+    PENDING_WITHDRAWAL.save(deps.storage, &WithdrawalData { receiver, amount });
+
+    let withdraw_msg = DistribtionExecMsg::Withdraw { weight, diff };
+
+    let config = CONFIG.load(deps.storage)?;
+
+    let withdraw_msg = WasmMsg::Execute {
+        contract_addr: config.distribution_contract.into_string(),
+        msg: to_json_binary(&withdraw_msg)?,
+        funds: vec![],
+    };
+
+    let withdraw_msg = SubMsg::reply_on_success(withdraw_msg, WITHDRAW_REPLY_ID);
+
+    let resp = Response::new()
+        .add_submessage(withdraw_msg)
+        .add_attribute("action", "withdraw")
+        .add_attribute("sender", info.sender.as_str())
+        .add_attribute("new weight", weight.to_string());
+
+    Ok(resp)
 }
 
 pub fn close(deps: DepsMut, info: MessageInfo) -> Result<Response, ContractError> {
