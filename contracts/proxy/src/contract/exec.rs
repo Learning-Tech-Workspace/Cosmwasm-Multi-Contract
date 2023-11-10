@@ -1,10 +1,10 @@
 use cosmwasm_std::{
-    coins, ensure, to_binary, to_json_binary, DepsMut, Env, MessageInfo, Response, StdResult,
-    SubMsg, Timestamp, Uint128, WasmMsg,
+    coins, ensure, to_json_binary, DepsMut, Env, MessageInfo, Response, StdResult, SubMsg, Uint128,
+    WasmMsg,
 };
 use cw_utils::must_pay;
 
-use crate::contract::WITHDRAW_REPLY_ID;
+use crate::contract::{PROPOSE_MEMBER_REPLY_ID, WITHDRAW_REPLY_ID};
 use crate::error::ContractError;
 use crate::msg::{DistribtionExecMsg, MembershipExecMsg};
 use crate::state::{
@@ -29,7 +29,7 @@ pub fn donate(deps: DepsMut, info: MessageInfo) -> Result<Response, ContractErro
 
     DONATIONS.update(deps.storage, |donations| -> StdResult<_> {
         Ok(donations + 1)
-    });
+    })?;
 
     let resp = Response::new()
         .add_message(distribution_msg)
@@ -54,16 +54,16 @@ pub fn withdraw(
     let donations = DONATIONS.load(deps.storage)?;
     let diff = donations as i64 - weight as i64;
 
-    WEIGHT.save(deps.storage, &donations);
-    DONATIONS.save(deps.storage, &1);
-    LAST_UPDATED.save(deps.storage, &env.block.time.seconds());
+    WEIGHT.save(deps.storage, &donations)?;
+    DONATIONS.save(deps.storage, &1)?;
+    LAST_UPDATED.save(deps.storage, &env.block.time.seconds())?;
 
     let receiver = receiver
         .map(|addr_str| deps.api.addr_validate(&addr_str))
         .transpose()?
         .unwrap_or_else(|| info.sender.clone()); // if do not specify receiver => withdraw to owner
 
-    PENDING_WITHDRAWAL.save(deps.storage, &WithdrawalData { receiver, amount });
+    PENDING_WITHDRAWAL.save(deps.storage, &WithdrawalData { receiver, amount })?;
 
     let withdraw_msg = DistribtionExecMsg::Withdraw { weight, diff };
 
@@ -116,11 +116,13 @@ pub fn propose_member(
         msg: to_json_binary(&propose_member_msg)?,
         funds: vec![],
     };
+    let propose_member_msg = SubMsg::reply_on_success(propose_member_msg, PROPOSE_MEMBER_REPLY_ID);
+
     let resp = Response::new()
-        .add_message(propose_member_msg)
+        .add_submessage(propose_member_msg)
         .add_attribute("action", "propose member")
         .add_attribute("sender", info.sender.as_str())
-        .add_attribute("addr", addr);
+        .add_attribute("new member", addr);
     Ok(resp)
 }
 

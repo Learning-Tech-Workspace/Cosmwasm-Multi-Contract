@@ -1,4 +1,4 @@
-use cosmwasm_std::{coins, BankMsg, DepsMut, Env, Response};
+use cosmwasm_std::{coins, BankMsg, DepsMut, Env, Response, StdError, SubMsgResponse};
 
 use crate::{
     error::ContractError,
@@ -35,4 +35,16 @@ pub fn withdraw(deps: DepsMut, env: Env) -> Result<Response, ContractError> {
         .add_attribute("amount", amount.to_string());
 
     Ok(resp)
+}
+
+// forward data get from reply of membership contract
+pub fn propose_member(reply: Result<SubMsgResponse, String>) -> Result<Response, ContractError> {
+    let response = reply.map_err(StdError::generic_err)?;
+    // can do like the membership contract or simple like this
+    if let Some(data) = response.data {
+        let resp = Response::new().set_data(data);
+        Ok(resp)
+    } else {
+        Ok(Response::new())
+    }
 }
