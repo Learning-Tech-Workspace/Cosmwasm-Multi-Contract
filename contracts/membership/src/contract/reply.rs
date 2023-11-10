@@ -1,5 +1,5 @@
 use cosmwasm_std::{
-    to_json_binary, Addr, DepsMut, Order, Response, StdError, StdResult, SubMsgResponse,
+    to_json_binary, Addr, DepsMut, Empty, Order, Response, StdError, StdResult, SubMsgResponse,
 };
 use cw_utils::parse_instantiate_response_data;
 
@@ -49,6 +49,31 @@ pub fn initial_proxy_instantiated(
     let data = InstantiationData { members };
     let resp = Response::new()
         .add_attribute("proxy addr", proxy_addr.as_str())
+        .set_data(to_json_binary(&data)?);
+
+    Ok(resp)
+}
+
+pub fn proxy_instantiated(
+    deps: DepsMut,
+    reply: Result<SubMsgResponse, String>,
+) -> Result<Response, ContractError> {
+    let response = reply.map_err(StdError::generic_err)?;
+    let data = response.data.ok_or(ContractError::MissingData)?;
+    let response = parse_instantiate_response_data(&data)?;
+    let addr = Addr::unchecked(response.contract_address); // proxy contract address
+
+    let owner = proxy::state::OWNER.query(&deps.querier, addr.clone())?;
+
+    MEMBERS.save(deps.storage, &addr, &Empty {})?;
+
+    let data = ProposeMemberData {
+        owner_addr: owner,
+        proxy_addr: addr.clone(),
+    };
+
+    let resp = Response::new()
+        .add_attribute("proxy_addr", addr.as_str())
         .set_data(to_json_binary(&data)?);
 
     Ok(resp)

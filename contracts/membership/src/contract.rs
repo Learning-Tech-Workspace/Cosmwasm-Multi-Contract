@@ -15,6 +15,7 @@ use crate::state::{Config, AWAITING_INITIAL_RESPS, CONFIG};
 use proxy::msg::InstantiateMsg as ProxyInstantiateMsg;
 
 const INITIAL_PROXY_INSTANTIATION_REPLY_ID: u64 = 1;
+const PROXY_INSTANTIATION_REPLY_ID: u64 = 2;
 
 pub fn instantiate(
     deps: DepsMut,
@@ -105,6 +106,7 @@ pub fn reply(deps: DepsMut, env: Env, reply: Reply) -> Result<Response, Contract
         INITIAL_PROXY_INSTANTIATION_REPLY_ID => {
             reply::initial_proxy_instantiated(deps, reply.result.into_result())
         }
+        PROXY_INSTANTIATION_REPLY_ID => reply::proxy_instantiated(deps, reply.result.into_result()),
         id => Err(ContractError::UnrecognizedReplyId(id)),
     }
 }
