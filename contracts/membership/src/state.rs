@@ -10,8 +10,15 @@ pub struct Config {
     pub halftime: u64,
     pub proxy_code_id: u64,
     pub distribution_contract: Addr,
+    pub minimal_acceptances: u64,
 }
 
 pub const CONFIG: Item<Config> = Item::new("config");
-pub const MEMBERS: Map<Addr, Empty> = Map::new("members");
-pub const PROPOSALS: Map<Addr, u64> = Map::new("proposals");
+pub const MEMBERS: Map<&Addr, Empty> = Map::new("members"); // proxy contracts addresses
+pub const PROPOSALS: Map<&Addr, u64> = Map::new("proposals");
+// candidate want to join group, and number of their proposals
+
+pub const VOTES: Map<(&Addr, &Addr), Empty> = Map::new("votes");
+// member in system, candidate want to join group
+
+pub const AWAITING_INITIAL_RESPS: Item<u64> = Item::new("awaiting_initial_resps");
