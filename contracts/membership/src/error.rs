@@ -18,4 +18,8 @@ pub enum ContractError {
     MissingData,
     #[error("Unknown reply id")]
     UnrecognizedReplyId(u64),
+    #[error("Already voted on this proposal")]
+    AlreadyVoted,
+    #[error("Cannot propose a member")]
+    AlreadyAMember,
 }

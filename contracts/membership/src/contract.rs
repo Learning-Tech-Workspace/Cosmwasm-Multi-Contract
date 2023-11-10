@@ -8,7 +8,7 @@ mod exec;
 mod reply;
 
 use crate::error::ContractError;
-use crate::msg::InstantiateMsg;
+use crate::msg::{ExecMsg, InstantiateMsg};
 use crate::state::{Config, AWAITING_INITIAL_RESPS, CONFIG};
 
 // Get instantiate msg of proxy contract
@@ -87,6 +87,17 @@ pub fn instantiate(
     // and membership contract will have reply handler for those replies
 
     Ok(resp)
+}
+
+pub fn execute(
+    deps: DepsMut,
+    env: Env,
+    info: MessageInfo,
+    msg: ExecMsg,
+) -> Result<Response, ContractError> {
+    match msg {
+        ExecMsg::ProposeMember { addr } => exec::propose_member(deps, env, info, addr),
+    }
 }
 
 pub fn reply(deps: DepsMut, env: Env, reply: Reply) -> Result<Response, ContractError> {
