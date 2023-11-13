@@ -1,14 +1,16 @@
 use std::vec;
 
 use cosmwasm_std::{
-    ensure, to_json_binary, Addr, DepsMut, Env, MessageInfo, Reply, Response, SubMsg, WasmMsg,
+    ensure, to_json_binary, Addr, Binary, Deps, DepsMut, Env, MessageInfo, Reply, Response,
+    StdResult, SubMsg, WasmMsg,
 };
 
 mod exec;
+mod query;
 mod reply;
 
 use crate::error::ContractError;
-use crate::msg::{ExecMsg, InstantiateMsg};
+use crate::msg::{ExecMsg, InstantiateMsg, QueryMsg};
 use crate::state::{Config, AWAITING_INITIAL_RESPS, CONFIG};
 
 // Get instantiate msg of proxy contract
@@ -108,5 +110,11 @@ pub fn reply(deps: DepsMut, env: Env, reply: Reply) -> Result<Response, Contract
         }
         PROXY_INSTANTIATION_REPLY_ID => reply::proxy_instantiated(deps, reply.result.into_result()),
         id => Err(ContractError::UnrecognizedReplyId(id)),
+    }
+}
+
+pub fn query(deps: Deps, env: Env, msg: QueryMsg) -> StdResult<Binary> {
+    match msg {
+        QueryMsg::IsMember { addr } => to_json_binary(&query::is_member(deps, addr)?),
     }
 }

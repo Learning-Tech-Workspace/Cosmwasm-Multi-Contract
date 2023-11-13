@@ -8,6 +8,7 @@ crate-type = ["cdylib", "rlib"]
 
 [features]
 library = []
+mt = ["library", "cw-multi-test", "anyhow"]
 
 [dependencies]
 cosmwasm-std = "1.1.9"
@@ -18,3 +19,10 @@ cosmwasm-schema = "1.1.9"
 thiserror = "1.0.38"
 proxy={version = "0.1.0", path = "../proxy", features = ["library"]}
 cw-utils = "1.0.2"
+anyhow = { version = "1.0.70", optional = true }
+cw-multi-test = { version = "0.16.2", optional = true }
+
+[dev-dependencies]
+anyhow = "1.0.70"
+cw-multi-test = "0.16.2"
+proxy = { path = "../proxy", features = ["mt"] }

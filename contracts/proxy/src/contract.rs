@@ -1,5 +1,5 @@
 use cosmwasm_std::{
-    ensure, Binary, Decimal, Deps, DepsMut, Env, MessageInfo, Reply, Response, StdResult,
+    ensure, Addr, Binary, Decimal, Deps, DepsMut, Env, MessageInfo, Reply, Response, StdResult,
 };
 
 use crate::error::ContractError;
@@ -24,7 +24,8 @@ pub fn instantiate(
     );
 
     let owner = deps.api.addr_validate(&msg.owner)?;
-    let distribution_contract = deps.api.addr_validate(&msg.distribution_contract)?;
+    // let distribution_contract = deps.api.addr_validate(&msg.distribution_contract)?;
+    let distribution_contract = Addr::unchecked(msg.distribution_contract);
     let membership_contract = deps.api.addr_validate(&msg.membership_contract)?;
 
     OWNER.save(deps.storage, &owner)?;

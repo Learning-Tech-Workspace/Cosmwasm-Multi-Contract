@@ -8,7 +8,7 @@ mod contract;
 mod error;
 pub mod msg;
 #[cfg(any(feature = "mt", test))]
-mod multitest;
+pub mod multitest;
 pub mod state;
 
 #[cfg_attr(not(feature = "library"), entry_point)]
