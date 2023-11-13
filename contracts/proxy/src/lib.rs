@@ -1,22 +1,29 @@
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
-use cosmwasm_std::{DepsMut, Env, MessageInfo, Reply, Response};
+use cosmwasm_std::{Binary, Deps, DepsMut, Env, MessageInfo, Reply, Response, StdResult};
 use error::ContractError;
-use msg::{ExecMsg, InstantiateMsg};
+use msg::{ExecMsg, InstantiateMsg, QueryMsg};
 
 mod contract;
 mod error;
 pub mod msg;
+#[cfg(any(feature = "mt", test))]
+mod multitest;
 pub mod state;
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn instantiate(
     deps: DepsMut,
     env: Env,
-    _info: MessageInfo,
+    info: MessageInfo,
     msg: InstantiateMsg,
 ) -> Result<Response, ContractError> {
     contract::instantiate(deps, env, msg)
+}
+
+#[cfg_attr(not(feature = "library"), entry_point)]
+pub fn query(deps: Deps, env: Env, msg: QueryMsg) -> StdResult<Binary> {
+    contract::query(deps, env, msg)
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]

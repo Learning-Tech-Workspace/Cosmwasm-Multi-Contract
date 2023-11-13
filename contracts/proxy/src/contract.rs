@@ -1,10 +1,13 @@
-use cosmwasm_std::{ensure, Decimal, DepsMut, Env, MessageInfo, Reply, Response};
+use cosmwasm_std::{
+    ensure, Binary, Decimal, Deps, DepsMut, Env, MessageInfo, Reply, Response, StdResult,
+};
 
 use crate::error::ContractError;
-use crate::msg::{ExecMsg, InstantiateMsg};
+use crate::msg::{ExecMsg, InstantiateMsg, QueryMsg};
 use crate::state::{Config, CONFIG, DONATIONS, HALFTIME, LAST_UPDATED, OWNER, WEIGHT};
 
 mod exec;
+mod query;
 mod reply;
 
 const WITHDRAW_REPLY_ID: u64 = 1;
@@ -66,4 +69,8 @@ pub fn reply(deps: DepsMut, env: Env, reply: Reply) -> Result<Response, Contract
         PROPOSE_MEMBER_REPLY_ID => reply::propose_member(reply.result.into_result()),
         id => Err(ContractError::UnrecognizedReplyId(id)),
     }
+}
+
+pub fn query(deps: Deps, env: Env, msg: QueryMsg) -> StdResult<Binary> {
+    Ok(Binary::default())
 }
