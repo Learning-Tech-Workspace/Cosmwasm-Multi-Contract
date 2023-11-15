@@ -1,8 +1,3 @@
-[package]
-name = "donations_distribution_system"
-version = "0.1.0"
-edition = "2021"
-
 [workspace]
-members = ["contracts/proxy", "contracts/membership"]
+members = ["contracts/*", "common"]
 resolver = "2"

@@ -1,13 +1,12 @@
 use anyhow::Result as AnyResult;
+use common::msg::ProposeMemberData;
 use cosmwasm_std::{from_json, to_json_binary, Addr, Decimal, WasmMsg};
 use cw_multi_test::{App, ContractWrapper, Executor};
 use cw_utils::{parse_execute_response_data, parse_instantiate_response_data};
 
 use crate::{
     execute, instantiate,
-    msg::{
-        ExecMsg, InstantiateMsg, InstantiationData, IsMemberResponse, ProposeMemberData, QueryMsg,
-    },
+    msg::{ExecMsg, InstantiateMsg, InstantiationData, IsMemberResponse, QueryMsg},
     query, reply,
 };
 

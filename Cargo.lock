@@ -92,6 +92,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
+name = "common"
+version = "0.1.0"
+dependencies = [
+ "cosmwasm-schema",
+]
+
+[[package]]
 name = "const-oid"
 version = "0.9.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -334,10 +341,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "donations_distribution_system"
-version = "0.1.0"
-
-[[package]]
 name = "dyn-clone"
 version = "1.0.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -575,6 +578,7 @@ name = "membership"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "common",
  "cosmwasm-schema",
  "cosmwasm-std",
  "cw-multi-test",
@@ -655,6 +659,7 @@ name = "proxy"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "common",
  "cosmwasm-schema",
  "cosmwasm-std",
  "cw-multi-test",

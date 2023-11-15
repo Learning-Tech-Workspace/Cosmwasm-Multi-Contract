@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use cosmwasm_std::Addr;
 use cosmwasm_std::Decimal;
 use cw_multi_test::App;
 
@@ -45,8 +46,8 @@ pub fn adding_member() {
         .into_iter()
         .map(|member| {
             (
-                member.owner_addr.into_string(),
-                ProxyContract::from_addr(member.proxy_addr),
+                member.owner_addr,
+                ProxyContract::from_addr(Addr::unchecked(member.proxy_addr)),
             )
         })
         .collect();

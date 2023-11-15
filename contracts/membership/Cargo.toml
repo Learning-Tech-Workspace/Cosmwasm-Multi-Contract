@@ -21,6 +21,7 @@ proxy={version = "0.1.0", path = "../proxy", features = ["library"]}
 cw-utils = "1.0.2"
 anyhow = { version = "1.0.70", optional = true }
 cw-multi-test = { version = "0.16.2", optional = true }
+common = { version = "0.1.0", path = "../../common" }
 
 [dev-dependencies]
 anyhow = "1.0.70"
